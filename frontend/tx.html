@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tài Xỉu TQPAY</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Arial", sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+        color: white;
+        min-height: 100vh;
+        padding: 20px;
+      }
+      .music-toggle {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        font-size: 24px;
+      }
+
+      .main-container {
+        display: flex;
+        gap: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+
+      .game-container {
+        flex: 2;
+        background-color: rgba(0, 0, 0, 0.7);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+      }
+
+      .chat-container {
+        flex: 1;
+        background-color: rgba(0, 0, 0, 0.7);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-direction: column;
+        max-height: 800px;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #fdbb2d;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        color: #fdbb2d;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+      }
+
+      .login-section {
+        text-align: center;
+        padding: 20px;
+      }
+
+      .auth-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        padding: 40px;
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        max-width: 400px;
+        margin: 0 auto;
+      }
+
+      .auth-form {
+        text-align: center;
+      }
+
+      .auth-form h2 {
+        color: #fdbb2d;
+        margin-bottom: 30px;
+        font-size: 2rem;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      .input-group input {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        transition: all 0.3s;
+      }
+
+      .input-group input:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(253, 187, 45, 0.5);
+        transform: translateY(-2px);
+      }
+
+      .auth-btn {
+        width: 100%;
+        padding: 15px;
+        background: linear-gradient(45deg, #fdbb2d, #b21f1f);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-bottom: 20px;
+      }
+
+      .auth-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(253, 187, 45, 0.4);
+      }
+
+      .auth-links {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .auth-links a {
+        color: #fdbb2d;
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .auth-links a:hover {
+        color: #ffcc44;
+        text-decoration: underline;
+      }
+
+      .forgot-password {
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+
+      .game-section {
+        display: none;
+      }
+
+      .game-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+      }
+
+      .balance,
+      .bet-amount {
+        font-size: 1.2rem;
+      }
+
+      .balance span,
+      .bet-amount span {
+        color: #fdbb2d;
+        font-weight: bold;
+      }
+
+      .dice-container {
+        display: flex;
+        justify-content: space-around;
+        margin: 30px 0;
+      }
+
+      .dice {
+        width: 100px;
+        height: 100px;
+        background-color: white;
+        border-radius: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 3rem;
+        color: #333;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s;
+      }
+
+      .dice.rolling {
+        animation: roll 0.5s infinite;
+      }
+
+      @keyframes roll {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .bet-options {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        gap: 10px;
+      }
+
+      .bet-option {
+        padding: 15px 25px;
+        background-color: #1a2a6c;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        /* flex: 1; */
+      }
+
+      .bet-option:hover {
+        background-color: #2a3a9c;
+        transform: translateY(-3px);
+      }
+
+      .bet-option.selected {
+        background-color: #fdbb2d;
+        color: #333;
+        box-shadow: 0 0 15px rgba(253, 187, 45, 0.7);
+      }
+
+      .all-in-btn {
+        background-color: #b21f1f;
+      }
+
+      .all-in-btn:hover {
+        background-color: #d22f2f;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        gap: 10px;
+      }
+
+      .bet-controls {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex: 2;
+      }
+
+      .all-in-controls {
+        flex: 1;
+        display: flex;
+        justify-content: flex-end;
+      }
+
+      button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .roll-btn {
+        background-color: #b21f1f;
+        color: white;
+        font-size: 1.2rem;
+        padding: 15px 30px;
+      }
+
+      .roll-btn:hover {
+        background-color: #d22f2f;
+        transform: scale(1.05);
+      }
+
+      .bet-btn {
+        background-color: #1a2a6c;
+        color: white;
+      }
+
+      .bet-btn:hover {
+        background-color: #2a3a9c;
+      }
+
+      .history {
+        margin-top: 30px;
+        background-color: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+      }
+
+      .history h3 {
+        margin-bottom: 10px;
+        color: #fdbb2d;
+      }
+
+      .history-list {
+        max-height: 150px;
+        overflow-y: auto;
+      }
+
+      .history-item {
+        padding: 5px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .win {
+        color: #4caf50;
+      }
+
+      .lose {
+        color: #f44336;
+      }
+
+      .result {
+        text-align: center;
+        margin: 20px 0;
+        font-size: 1.5rem;
+        min-height: 40px;
+      }
+
+      .win-message {
+        color: #4caf50;
+        font-weight: bold;
+      }
+
+      .lose-message {
+        color: #f44336;
+        font-weight: bold;
+      }
+
+      /* Chat Styles */
+      .chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #fdbb2d;
+      }
+
+      .online-users {
+        font-size: 0.9rem;
+        color: #fdbb2d;
+      }
+
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        max-height: 500px;
+        margin-bottom: 15px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+      }
+
+      .message {
+        margin-bottom: 10px;
+        padding: 8px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .message.system {
+        background: rgba(253, 187, 45, 0.2);
+        font-style: italic;
+        text-align: center;
+      }
+
+      .message.user {
+        background: rgba(26, 42, 108, 0.3);
+      }
+
+      .message.game {
+        background: rgba(178, 31, 31, 0.3);
+        text-align: center;
+        font-weight: bold;
+      }
+
+      .message-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        color: #fdbb2d;
+        margin-bottom: 5px;
+      }
+
+      .chat-input-container {
+        display: flex;
+        gap: 10px;
+      }
+
+      .chat-input {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.9);
+      }
+
+      .send-btn {
+        background: #fdbb2d;
+        color: #333;
+        font-weight: bold;
+      }
+
+      .send-btn:hover {
+        background: #ffcc44;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Đặt này ở ngay sau thẻ <body> -->
+    <div class="music-toggle" id="music-toggle">
+      <span id="music-icon">🎵</span>
+    </div>
+    <div class="main-container">
+      <div class="game-container">
+        <header>
+          <h1>TÀI XỈU TQPAY</h1>
+          <p>
+            Chọn TÀI (tổng 11-17) hoặc XỈU (tổng 4-10) và thử vận may của bạn!
+          </p>
+        </header>
+
+        <!-- Phần đăng nhập -->
+        <!-- Phần đăng nhập -->
+        <div class="login-section" id="login-section">
+          <div class="auth-container">
+            <!-- Form Đăng Nhập -->
+            <div class="auth-form" id="login-form">
+              <h2>Đăng Nhập</h2>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="username"
+                  placeholder="Tên đăng nhập"
+                  value="player1"
+                />
+              </div>
+              <div class="input-group">
+                <input
+                  type="password"
+                  id="password"
+                  placeholder="Mật khẩu"
+                  value="123456"
+                />
+              </div>
+              <button class="auth-btn" id="login-btn">Đăng Nhập</button>
+              <div class="auth-links">
+                <a href="#" id="show-register"
+                  >Chưa có tài khoản? Đăng ký ngay</a
+                >
+                <a href="#" class="forgot-password">Quên mật khẩu?</a>
+              </div>
+            </div>
+
+            <!-- Form Đăng Ký -->
+            <div class="auth-form" id="register-form" style="display: none">
+              <h2>Đăng Ký</h2>
+              <div class="input-group">
+                <input
+                  type="text"
+                  id="reg-username"
+                  placeholder="Tên đăng nhập"
+                />
+              </div>
+              <div class="input-group">
+                <input
+                  type="password"
+                  id="reg-password"
+                  placeholder="Mật khẩu"
+                />
+              </div>
+              <div class="input-group">
+                <input
+                  type="password"
+                  id="reg-confirm-password"
+                  placeholder="Xác nhận mật khẩu"
+                />
+              </div>
+              <button class="auth-btn" id="register-btn">Đăng Ký</button>
+              <div class="auth-links">
+                <a href="#" id="show-login">Đã có tài khoản? Đăng nhập ngay</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Phần game (ẩn ban đầu) -->
+        <div class="game-section" id="game-section">
+          <div class="game-info">
+            <div class="balance">Số dư: <span id="balance">0</span> VNĐ</div>
+            <div class="bet-amount">
+              Cược: <span id="current-bet">10000</span> VNĐ
+            </div>
+          </div>
+
+          <div class="dice-container">
+            <div class="dice" id="dice1">?</div>
+            <div class="dice" id="dice2">?</div>
+            <div class="dice" id="dice3">?</div>
+          </div>
+
+          <div class="result" id="result"></div>
+
+          <div class="bet-options">
+            <button class="bet-option" id="bet-small">XỈU</button>
+            <button class="bet-option all-in-btn" id="all-in-btn">
+              ALL IN
+            </button>
+            <button class="bet-option" id="bet-big">TÀI</button>
+          </div>
+
+          <div class="controls">
+            <div class="bet-controls">
+              <button class="bet-btn" id="decrease-bet-100k">-100000</button>
+              <button class="bet-btn" id="decrease-bet">-10000</button>
+              <button class="bet-btn" id="reset-bet">0</button>
+              <button class="bet-btn" id="increase-bet">+10000</button>
+              <button class="bet-btn" id="increase-bet-100k">+100000</button>
+            </div>
+            <div class="all-in-controls">
+              <button class="roll-btn" id="roll-btn">XÚC LÔ LUÔN</button>
+            </div>
+          </div>
+
+          <div class="history">
+            <h3>Lịch sử chơi</h3>
+            <div class="history-list" id="history-list"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Khung Chat -->
+      <div class="chat-container" id="chat-section" style="display: none">
+        <div class="chat-header">
+          <h3>Phòng Chat</h3>
+          <div class="online-users">
+            Online: <span id="online-count">0</span>
+          </div>
+        </div>
+        <div class="chat-messages" id="chat-messages"></div>
+        <div class="chat-input-container">
+          <input
+            type="text"
+            class="chat-input"
+            id="chat-input"
+            placeholder="Nhập tin nhắn..."
+            maxlength="200"
+          />
+          <button class="send-btn" id="send-btn">Gửi</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Biến trạng thái trò chơi
+      let balance = 0;
+      let currentBet = 10000;
+      let selectedBet = null;
+      let gameHistory = [];
+      let currentUser = null;
+      let ws = null;
+
+      // Các phần tử DOM
+      const balanceElement = document.getElementById("balance");
+      const currentBetElement = document.getElementById("current-bet");
+      const dice1Element = document.getElementById("dice1");
+      const dice2Element = document.getElementById("dice2");
+      const dice3Element = document.getElementById("dice3");
+      const betSmallButton = document.getElementById("bet-small");
+      const betBigButton = document.getElementById("bet-big");
+      const allInButton = document.getElementById("all-in-btn");
+      const decreaseBetButton = document.getElementById("decrease-bet");
+      const increaseBetButton = document.getElementById("increase-bet");
+      const rollButton = document.getElementById("roll-btn");
+      const resultElement = document.getElementById("result");
+      const historyListElement = document.getElementById("history-list");
+      const loginSection = document.getElementById("login-section");
+      const gameSection = document.getElementById("game-section");
+      const chatSection = document.getElementById("chat-section");
+      const loginButton = document.getElementById("login-btn");
+      const usernameInput = document.getElementById("username");
+      const passwordInput = document.getElementById("password");
+      const chatMessages = document.getElementById("chat-messages");
+      const chatInput = document.getElementById("chat-input");
+      const sendButton = document.getElementById("send-btn");
+      const onlineCount = document.getElementById("online-count");
+
+      // API base URL
+      const API_BASE = "http://localhost:3000/api";
+
+      // Đăng nhập
+      loginButton.addEventListener("click", async function () {
+        const username = usernameInput.value;
+        const password = passwordInput.value;
+
+        if (!username || !password) {
+          alert("Vui lòng nhập username và password");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_BASE}/login`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            currentUser = data.user;
+            balance = parseFloat(data.user.balance);
+            updateDisplay();
+            loginSection.style.display = "none";
+            gameSection.style.display = "block";
+            chatSection.style.display = "flex";
+            loadGameHistory();
+            connectWebSocket();
+
+            // Phát nhạc nền tự động sau khi đăng nhập thành công
+            if (musicEnabled) {
+              backgroundMusic.play().catch((error) => {
+                console.log("Không thể phát nhạc tự động:", error);
+              });
+            }
+          } else {
+            alert(data.error);
+          }
+        } catch (error) {
+          console.error("Lỗi đăng nhập:", error);
+          alert("Lỗi kết nối server");
+        }
+      });
+      // Thêm vào phần JavaScript
+      document
+        .getElementById("show-register")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          document.getElementById("login-form").style.display = "none";
+          document.getElementById("register-form").style.display = "block";
+        });
+
+      document
+        .getElementById("show-login")
+        .addEventListener("click", function (e) {
+          e.preventDefault();
+          document.getElementById("register-form").style.display = "none";
+          document.getElementById("login-form").style.display = "block";
+        });
+
+      // Xử lý đăng ký (tạm thời alert)
+      // Thay thế phần xử lý đăng ký cũ bằng:
+      document
+        .getElementById("register-btn")
+        .addEventListener("click", async function () {
+          const username = document.getElementById("reg-username").value;
+          const password = document.getElementById("reg-password").value;
+          const confirmPassword = document.getElementById(
+            "reg-confirm-password"
+          ).value;
+
+          if (!username || !password) {
+            alert("Vui lòng nhập đầy đủ thông tin");
+            return;
+          }
+
+          if (password !== confirmPassword) {
+            alert("Mật khẩu xác nhận không khớp");
+            return;
+          }
+
+          try {
+            const response = await fetch(`${API_BASE}/register`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ username, password }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+              alert("Đăng ký thành công! Vui lòng đăng nhập.");
+              // Chuyển về form đăng nhập
+              document.getElementById("register-form").style.display = "none";
+              document.getElementById("login-form").style.display = "block";
+              // Điền sẵn username
+              document.getElementById("username").value = username;
+            } else {
+              alert(data.error);
+            }
+          } catch (error) {
+            console.error("Lỗi đăng ký:", error);
+            alert("Lỗi kết nối server");
+          }
+        });
+      // Kết nối WebSocket
+      function connectWebSocket() {
+        ws = new WebSocket("ws://localhost:3000");
+
+        ws.onopen = function () {
+          console.log("WebSocket connected");
+          // Gửi thông tin login qua WebSocket
+          ws.send(
+            JSON.stringify({
+              type: "login",
+              userId: currentUser.id,
+              username: currentUser.username,
+            })
+          );
+        };
+
+        ws.onmessage = function (event) {
+          const data = JSON.parse(event.data);
+          handleWebSocketMessage(data);
+        };
+
+        ws.onclose = function () {
+          console.log("WebSocket disconnected");
+          addChatMessage("system", "Hệ thống", "Mất kết nối với server");
+        };
+
+        ws.onerror = function (error) {
+          console.error("WebSocket error:", error);
+        };
+      }
+
+      // Thêm vào phần khai báo biến
+      let musicEnabled = true;
+      let backgroundMusic = new Audio("/sounds/thienlyoi.mp3");
+      backgroundMusic.loop = true;
+
+      // Xử lý nút loa
+      document
+        .getElementById("music-toggle")
+        .addEventListener("click", function () {
+          musicEnabled = !musicEnabled;
+          const icon = document.getElementById("music-icon");
+
+          if (musicEnabled) {
+            backgroundMusic.play();
+            icon.textContent = "🎵";
+          } else {
+            backgroundMusic.pause();
+            icon.textContent = "🔇";
+          }
+        });
+
+      // Tự động bật nhạc khi vào game (sau khi login)
+      // Thêm vào phần đăng nhập thành công
+      backgroundMusic.play();
+
+      // Xử lý tin nhắn WebSocket
+      function handleWebSocketMessage(data) {
+        switch (data.type) {
+          case "chat_message":
+            addChatMessage("user", data.username, data.message, data.timestamp);
+            break;
+          case "user_join":
+            addChatMessage("system", "Hệ thống", data.message, data.timestamp);
+            break;
+          case "user_leave":
+            addChatMessage("system", "Hệ thống", data.message, data.timestamp);
+            break;
+          case "game_result":
+            addChatMessage("game", data.username, data.message, data.timestamp);
+            break;
+          case "user_list":
+            onlineCount.textContent = data.users.length;
+            break;
+        }
+      }
+
+      // Thêm tin nhắn vào khung chat
+      function addChatMessage(type, username, message, timestamp) {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${type}`;
+
+        const time = new Date(timestamp).toLocaleTimeString("vi-VN");
+
+        messageDiv.innerHTML = `
+          <div class="message-header">
+            <span>${username}</span>
+            <span>${time}</span>
+          </div>
+          <div>${message}</div>
+        `;
+
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }
+
+      // Gửi tin nhắn chat
+      sendButton.addEventListener("click", sendChatMessage);
+      chatInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
+          sendChatMessage();
+        }
+      });
+
+      function sendChatMessage() {
+        const message = chatInput.value.trim();
+        if (message && ws) {
+          ws.send(
+            JSON.stringify({
+              type: "chat_message",
+              username: currentUser.username,
+              message: message,
+            })
+          );
+          chatInput.value = "";
+        }
+      }
+
+      // Nút ALL IN
+      allInButton.addEventListener("click", function () {
+        if (balance > 0) {
+          currentBet = balance;
+          updateDisplay();
+          addChatMessage(
+            "system",
+            "Hệ thống",
+            `${
+              currentUser.username
+            } đã ALL IN ${currentBet.toLocaleString()} VNĐ!`
+          );
+        }
+      });
+
+      // Tải lịch sử game
+      async function loadGameHistory() {
+        try {
+          const response = await fetch(`${API_BASE}/history/${currentUser.id}`);
+          const history = await response.json();
+          gameHistory = history;
+          updateHistory();
+        } catch (error) {
+          console.error("Lỗi tải lịch sử:", error);
+        }
+      }
+
+      // Cập nhật hiển thị số dư và cược
+      function updateDisplay() {
+        balanceElement.textContent = balance.toLocaleString();
+        currentBetElement.textContent = currentBet.toLocaleString();
+      }
+
+      // Xử lý chọn cược
+      betSmallButton.addEventListener("click", function () {
+        selectedBet = "small";
+        betSmallButton.classList.add("selected");
+        betBigButton.classList.remove("selected");
+      });
+
+      betBigButton.addEventListener("click", function () {
+        selectedBet = "big";
+        betBigButton.classList.add("selected");
+        betSmallButton.classList.remove("selected");
+      });
+
+      // Xử lý điều chỉnh cược
+      decreaseBetButton.addEventListener("click", function () {
+        if (currentBet > 10000) {
+          currentBet -= 10000;
+          updateDisplay();
+        }
+      });
+
+      increaseBetButton.addEventListener("click", function () {
+        if (currentBet + 10000 <= balance) {
+          currentBet += 10000;
+          updateDisplay();
+        }
+      });
+      // Thêm vào phần xử lý điều chỉnh cược (sau phần xử lý nút +-10000)
+
+      // Xử lý nút -100,000
+      document
+        .getElementById("decrease-bet-100k")
+        .addEventListener("click", function () {
+          if (currentBet > 100000) {
+            currentBet -= 100000;
+            updateDisplay();
+          } else if (currentBet > 0) {
+            currentBet = 0;
+            updateDisplay();
+          }
+        });
+
+      // Xử lý nút +100,000
+      document
+        .getElementById("increase-bet-100k")
+        .addEventListener("click", function () {
+          if (currentBet + 100000 <= balance) {
+            currentBet += 100000;
+            updateDisplay();
+          } else if (currentBet < balance) {
+            currentBet = balance; // Nếu không đủ 100k thì set toàn bộ số dư
+            updateDisplay();
+          }
+        });
+      // Xử lý nút reset về 0
+      document
+        .getElementById("reset-bet")
+        .addEventListener("click", function () {
+          currentBet = 10000;
+          updateDisplay();
+        });
+      // Xử lý lắc xúc xắc
+      rollButton.addEventListener("click", function () {
+        if (!selectedBet) {
+          alert("Vui lòng chọn TÀI hoặc XỈU trước khi lắc!");
+          return;
+        }
+
+        if (currentBet > balance) {
+          alert("Bạn không đủ tiền để đặt cược!");
+          return;
+        }
+
+        // Hiệu ứng lắc xúc xắc
+        dice1Element.classList.add("rolling");
+        dice2Element.classList.add("rolling");
+        dice3Element.classList.add("rolling");
+
+        // Vô hiệu hóa nút trong khi lắc
+        rollButton.disabled = true;
+
+        // Lắc xúc xắc sau 5 giây
+        setTimeout(rollDice, 5000);
+      });
+
+      // Hàm lắc xúc xắc
+      async function rollDice() {
+        if (!selectedBet || !currentUser) return;
+
+        try {
+          const response = await fetch(`${API_BASE}/play`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: currentUser.id,
+              betType: selectedBet,
+              betAmount: currentBet,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            // Hiển thị kết quả xúc xắc
+            dice1Element.textContent = data.dice[0];
+            dice2Element.textContent = data.dice[1];
+            dice3Element.textContent = data.dice[2];
+
+            // Dừng hiệu ứng lắc
+            dice1Element.classList.remove("rolling");
+            dice2Element.classList.remove("rolling");
+            dice3Element.classList.remove("rolling");
+
+            // Cập nhật số dư
+            balance = data.newBalance;
+            updateDisplay();
+
+            // Hiển thị kết quả
+            if (data.isWin) {
+              resultElement.innerHTML = `<span class="win-message">CHÚC MỪNG! Bạn đã thắng ${currentBet.toLocaleString()} VNĐ!</span>`;
+            } else {
+              resultElement.innerHTML = `<span class="lose-message">Rất tiếc! Bạn đã thua ${currentBet.toLocaleString()} VNĐ!</span>`;
+            }
+
+            // Broadcast kết quả game qua chat
+            // if (ws) {
+            //   const betType = selectedBet === "small" ? "XỈU" : "TÀI";
+            //   const resultType =
+            //     data.total >= 4 && data.total <= 10 ? "XỈU" : "TÀI";
+            //   const outcome = data.isWin ? "THẮNG" : "THUA";
+            //   const message = `${
+            //     currentUser.username
+            //   } cược ${betType} ${currentBet.toLocaleString()} VNĐ - Kết quả: ${
+            //     data.dice[0]
+            //   }-${data.dice[1]}-${data.dice[2]} (${
+            //     data.total
+            //   } - ${resultType}) - ${outcome}`;
+
+            //   ws.send(
+            //     JSON.stringify({
+            //       type: "game_result",
+            //       username: currentUser.username,
+            //       message: message,
+            //     })
+            //   );
+            // }
+
+            // Tải lại lịch sử
+            loadGameHistory();
+          } else {
+            alert(data.error);
+          }
+        } catch (error) {
+          console.error("Lỗi khi chơi game:", error);
+          alert("Lỗi kết nối server");
+        } finally {
+          rollButton.disabled = false;
+        }
+      }
+
+      // Cập nhật lịch sử
+      function updateHistory() {
+        historyListElement.innerHTML = "";
+
+        gameHistory.forEach((item) => {
+          const historyItem = document.createElement("div");
+          historyItem.className = `history-item ${
+            item.result === "win" ? "win" : "lose"
+          }`;
+
+          const betType = item.bet_type === "small" ? "XỈU" : "TÀI";
+          const resultType =
+            item.total >= 4 && item.total <= 10 ? "XỈU" : "TÀI";
+          const outcome = item.result === "win" ? "THẮNG" : "THUA";
+
+          historyItem.textContent = `Cược ${betType}, Kết quả: ${item.dice1}-${item.dice2}-${item.dice3} (${item.total} - ${resultType}) - ${outcome} ${item.bet_amount} VNĐ`;
+
+          historyListElement.appendChild(historyItem);
+        });
+      }
+
+      // Khởi tạo
+      updateDisplay();
+    </script>
+  </body>
+</html>

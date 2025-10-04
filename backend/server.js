@@ -199,6 +199,88 @@ app.post("/api/register", async (req, res) => {
     res.status(500).json({ error: "Lỗi server" });
   }
 });
+// API Thống kê lịch sử
+// API Thống kê lịch sử
+app.get("/api/stats/:userId", async (req, res) => {
+  try {
+    const [stats] = await db.execute(
+      `SELECT 
+          COUNT(*) as totalGames,
+          SUM(CASE WHEN result = 'win' THEN 1 ELSE 0 END) as wins,
+          SUM(CASE WHEN result = 'lose' THEN 1 ELSE 0 END) as losses,
+          COALESCE(SUM(CASE WHEN result = 'win' THEN bet_amount ELSE -bet_amount END), 0) as totalProfit
+       FROM game_history 
+       WHERE user_id = ?`,
+      [req.params.userId]
+    );
+
+    // Debug: log kết quả để kiểm tra
+    console.log("Stats result:", stats[0]);
+    console.log("User ID:", req.params.userId);
+
+    res.json({
+      success: true,
+      stats: stats[0],
+    });
+  } catch (error) {
+    console.error("Lỗi API stats:", error);
+    res.status(500).json({ error: "Lỗi server" });
+  }
+});
+// API Nạp/Rút tiền
+app.post("/api/transaction", async (req, res) => {
+  try {
+    const { userId, type, amount, description } = req.body;
+
+    // Kiểm tra user
+    const [userRows] = await db.execute(
+      "SELECT balance FROM users WHERE id = ?",
+      [userId]
+    );
+
+    if (userRows.length === 0) {
+      return res.status(404).json({ error: "User không tồn tại" });
+    }
+
+    const currentBalance = parseFloat(userRows[0].balance);
+    let newBalance;
+
+    if (type === "deposit") {
+      newBalance = currentBalance + parseFloat(amount);
+    } else if (type === "withdraw") {
+      if (currentBalance < amount) {
+        return res.status(400).json({ error: "Số dư không đủ" });
+      }
+      newBalance = currentBalance - parseFloat(amount);
+    } else {
+      return res.status(400).json({ error: "Loại giao dịch không hợp lệ" });
+    }
+
+    // Cập nhật số dư
+    await db.execute("UPDATE users SET balance = ? WHERE id = ?", [
+      newBalance,
+      userId,
+    ]);
+
+    // Lưu lịch sử giao dịch (cần tạo bảng transaction_history)
+    await db.execute(
+      `INSERT INTO transaction_history 
+             (user_id, type, amount, description, balance_after) 
+             VALUES (?, ?, ?, ?, ?)`,
+      [userId, type, amount, description, newBalance]
+    );
+
+    res.json({
+      success: true,
+      newBalance: newBalance,
+      message:
+        type === "deposit" ? "Nạp tiền thành công" : "Rút tiền thành công",
+    });
+  } catch (error) {
+    console.error("Lỗi giao dịch:", error);
+    res.status(500).json({ error: "Lỗi server" });
+  }
+});
 
 // Lấy lịch sử game
 app.get("/api/history/:userId", async (req, res) => {

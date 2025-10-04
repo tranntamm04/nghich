@@ -431,6 +431,68 @@
       .send-btn:hover {
         background: #ffcc44;
       }
+      .stats-section,
+      .transaction-section {
+        margin-top: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        border-radius: 10px;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .stat-item {
+        background: rgba(0, 0, 0, 0.3);
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+      }
+
+      .stat-label {
+        display: block;
+        font-size: 0.9rem;
+        color: #fdbb2d;
+      }
+
+      .stat-value {
+        display: block;
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      .transaction-controls {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      #transaction-amount {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+      }
+
+      .transaction-btn {
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        color: white;
+        cursor: pointer;
+      }
+
+      .deposit {
+        background: #4caf50;
+      }
+
+      .withdraw {
+        background: #f44336;
+      }
     </style>
   </head>
   <body>
@@ -551,6 +613,45 @@
           <div class="history">
             <h3>Lịch sử chơi</h3>
             <div class="history-list" id="history-list"></div>
+          </div>
+          <div class="stats-section">
+            <h3>Thống Kê Cá Nhân</h3>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <span class="stat-label">Tổng số ván</span>
+                <span class="stat-value" id="total-games">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Thắng</span>
+                <span class="stat-value win" id="total-wins">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Thua</span>
+                <span class="stat-value lose" id="total-losses">0</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">Lợi nhuận</span>
+                <span class="stat-value" id="total-profit">0</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="transaction-section">
+            <h3>Nạp/Rút Tiền</h3>
+            <div class="transaction-controls">
+              <input
+                type="number"
+                id="transaction-amount"
+                placeholder="Số tiền"
+                min="10000"
+              />
+              <button class="transaction-btn deposit" id="deposit-btn">
+                Nạp Tiền
+              </button>
+              <button class="transaction-btn withdraw" id="withdraw-btn">
+                Rút Tiền
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -779,6 +880,99 @@
       // Thêm vào phần đăng nhập thành công
       backgroundMusic.play();
 
+      // Hàm tải thống kê
+      // Hàm tải thống kê
+      async function loadStats() {
+        try {
+          console.log("Loading stats for user:", currentUser.id);
+
+          const response = await fetch(`${API_BASE}/stats/${currentUser.id}`);
+          const data = await response.json();
+
+          console.log("Stats API response:", data); // DEBUG
+
+          if (data.success) {
+            document.getElementById("total-games").textContent =
+              data.stats.totalGames || 0;
+            document.getElementById("total-wins").textContent =
+              data.stats.wins || 0;
+            document.getElementById("total-losses").textContent =
+              data.stats.losses || 0;
+            document.getElementById("total-profit").textContent = (
+              data.stats.totalProfit || 0
+            ).toLocaleString();
+
+            console.log("Stats updated:", {
+              // DEBUG
+              totalGames: data.stats.totalGames,
+              wins: data.stats.wins,
+              losses: data.stats.losses,
+              totalProfit: data.stats.totalProfit,
+            });
+          } else {
+            console.error("Stats API error:", data.error);
+          }
+        } catch (error) {
+          console.error("Lỗi tải thống kê:", error);
+        }
+      }
+
+      // Xử lý nạp/rút tiền
+      document
+        .getElementById("deposit-btn")
+        .addEventListener("click", async function () {
+          await processTransaction("deposit");
+        });
+
+      document
+        .getElementById("withdraw-btn")
+        .addEventListener("click", async function () {
+          await processTransaction("withdraw");
+        });
+
+      async function processTransaction(type) {
+        const amount = parseInt(
+          document.getElementById("transaction-amount").value
+        );
+
+        if (!amount || amount < 10000) {
+          alert("Số tiền tối thiểu là 10,000 VNĐ");
+          return;
+        }
+
+        try {
+          const response = await fetch(`${API_BASE}/transaction`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              userId: currentUser.id,
+              type: type,
+              amount: amount,
+              description: `${type === "deposit" ? "Nạp" : "Rút"} tiền`,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            balance = data.newBalance;
+            updateDisplay();
+            alert(data.message);
+            document.getElementById("transaction-amount").value = "";
+          } else {
+            alert(data.error);
+          }
+        } catch (error) {
+          console.error("Lỗi giao dịch:", error);
+          alert("Lỗi kết nối server");
+        }
+      }
+
+      // Gọi loadStats() sau khi đăng nhập thành công
+      // Thêm vào phần đăng nhập thành công: loadStats();
+
       // Xử lý tin nhắn WebSocket
       function handleWebSocketMessage(data) {
         switch (data.type) {
@@ -1000,30 +1194,8 @@
               resultElement.innerHTML = `<span class="lose-message">Rất tiếc! Bạn đã thua ${currentBet.toLocaleString()} VNĐ!</span>`;
             }
 
-            // Broadcast kết quả game qua chat
-            // if (ws) {
-            //   const betType = selectedBet === "small" ? "XỈU" : "TÀI";
-            //   const resultType =
-            //     data.total >= 4 && data.total <= 10 ? "XỈU" : "TÀI";
-            //   const outcome = data.isWin ? "THẮNG" : "THUA";
-            //   const message = `${
-            //     currentUser.username
-            //   } cược ${betType} ${currentBet.toLocaleString()} VNĐ - Kết quả: ${
-            //     data.dice[0]
-            //   }-${data.dice[1]}-${data.dice[2]} (${
-            //     data.total
-            //   } - ${resultType}) - ${outcome}`;
-
-            //   ws.send(
-            //     JSON.stringify({
-            //       type: "game_result",
-            //       username: currentUser.username,
-            //       message: message,
-            //     })
-            //   );
-            // }
-
             // Tải lại lịch sử
+            loadStats();
             loadGameHistory();
           } else {
             alert(data.error);
